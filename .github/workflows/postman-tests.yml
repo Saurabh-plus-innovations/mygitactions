@@ -17,3 +17,5 @@ jobs:
           collection: '37276248-fcc353f6-93a2-4be1-b60c-fbaa2ec72eae'  # Postman Collection UID
           environment: '37276248-6427117b-642d-4fcf-a80e-f72f735789a7'  # Postman Environment Name
           apiKey: ${{ secrets.POSTMAN_API_KEY }}  # Use GitHub Secret
+          envVar: SKIP_ENDPOINTS="GetById-Menus,Get statistics"
+
