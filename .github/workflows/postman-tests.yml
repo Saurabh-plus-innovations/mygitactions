@@ -19,3 +19,21 @@ jobs:
           apiKey: ${{ secrets.POSTMAN_API_KEY }}  # Use GitHub Secret
           envVar: SKIP_ENDPOINTS="GetById-Menus,Get statistics"
 
+
+- name: Send Failure Email Notification
+  uses: dawidd6/action-send-mail@v3
+  with:
+    # Use connection URL for authentication
+    connection_url: ${{ secrets.MAIL_CONNECTION }}
+    # Mail server settings for Outlook
+    server_address: smtp.office365.com
+    server_port: 587
+    secure: true
+    # Email content
+    subject: "Postman Collection Tests Failed"
+    to: support@plusinnovations.co
+    from: your_outlook_email@outlook.com
+    body: |
+      The Postman Collection tests have failed.
+      Please check the workflow logs for more details.
+
