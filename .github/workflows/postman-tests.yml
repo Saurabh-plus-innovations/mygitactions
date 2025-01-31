@@ -1,4 +1,4 @@
-name: Postman Collection Run
+name: Postman Regression Test
 
 on:
   workflow_dispatch:
@@ -11,29 +11,39 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      # ✅ Step 1: Check API Accessibility Before Running Tests
       - name: Check API Accessibility
+        run: |
+          echo "Checking API response..."
+          curl -I https://aapli-dev-api.aapli.app/Cards/Add || exit 1
+
+      # ✅ Step 2: Debug DNS Resolution
+      - name: Debug DNS Resolution
         run: nslookup aapli-dev-api.aapli.app
 
+      # ✅ Step 3: Run Postman Collection with Newman
       - name: Run Postman Collection with Newman
         id: run-tests
         uses: gasparhe/newman-action@1.0.0
         with:
-          collection: '37276248-99d2ac53-1e38-4202-a31d-10243ac48837'  # Postman Collection UID
-          environment: '37276248-a955bc24-695e-4333-a396-79067ae4928f'  # Postman Environment Name
-          apiKey: ${{ secrets.POSTMAN_API_KEY }}  # Use GitHub Secret
+          collection: '37276248-fcc353f6-93a2-4be1-b60c-fbaa2ec72eae'
+          environment: '37276248-6427117b-642d-4fcf-a80e-f72f735789a7'
+          apiKey: ${{ secrets.POSTMAN_API_KEY }}
           envVar: SKIP_ENDPOINTS="GetById-Menus,Get statistics"
 
+      # ✅ Step 4: Log Environment Variables (for debugging)
+      - name: Print Environment Variables
+        run: env | grep POSTMAN || echo "No Postman env vars found."
+
+      # ✅ Step 5: Send Email Notification on Failure
       - name: Send Failure Email Notification
         if: failure()
         uses: dawidd6/action-send-mail@v3
         with:
-          # Use connection URL for authentication
           connection_url: ${{ secrets.MAIL_CONNECTION }}
-          # Mail server settings for Outlook
           server_address: smtp.office365.com
           server_port: 587
           secure: true
-          # Email content
           subject: "Postman Collection Tests Failed"
           to: support@plusinnovations.co
           from: your_outlook_email@outlook.com
