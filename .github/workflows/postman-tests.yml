@@ -11,6 +11,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      - name: Check API Accessibility
+        run: nslookup aapli-dev-api.aapli.app
+
       - name: Run Postman Collection with Newman
         id: run-tests
         uses: gasparhe/newman-action@1.0.0
