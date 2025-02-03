@@ -32,7 +32,7 @@ jobs:
         with:
           collection: ${{ env.REGRESSION_TEST_COLLECTION_UID }}  # Regression Test Collection UID
           environment: ${{ env.REGRESSION_ENVIRONMENT_UID }}  # Postman Environment UID
-          apiKey: ${{ secrets.POSTMANSECRET }}  # GitHub Secret for Postman API Key
+          apiKey: ${{ secrets.POSTMAN_API_KEY }}  # GitHub Secret for Postman API Key
           reporters: cli, json
           reporter-json-export: newman-report.json  # Save test report
 
