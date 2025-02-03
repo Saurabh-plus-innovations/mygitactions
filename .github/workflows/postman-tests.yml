@@ -13,9 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Step 1: Delay to allow services to initialize
-      - name: Delay for 60 seconds
-        run: sleep 60
 
       # ✅ Step 2: Checkout repository code
       - name: Checkout Code
