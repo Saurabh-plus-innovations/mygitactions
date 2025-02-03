@@ -2,6 +2,7 @@ name: Postman Regression Test
 
 on:
   workflow_dispatch:
+
 env:
   REGRESSION_TEST_COLLECTION_UID: '37276248-99d2ac53-1e38-4202-a31d-10243ac48837'
   REGRESSION_ENVIRONMENT_UID: '37276248-a955bc24-695e-4333-a396-79067ae4928f'
@@ -12,31 +13,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ Step 1: Delay to allow services to initialize
       - name: Delay for 60 seconds
         run: sleep 60
 
+      # ✅ Step 2: Checkout repository code
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      # ✅ Step 1: Check API Accessibility Before Running Tests
+      # ✅ Step 3: Check API Accessibility Before Running Tests
       - name: Check API Accessibility
         run: |
           echo "Checking API response..."
-          curl -I https://aapli-dev-api.aapli.app/Cards/Add || exit 1
+          response_code=$(curl -s -o /dev/null -w "%{http_code}" $DEV_URL/Cards/Add)
+          if [ "$response_code" -ne 200 ]; then
+            echo "API is not responding correctly. Response Code: $response_code"
+            exit 1
+          else
+            echo "API is reachable! Proceeding with tests..."
+          fi
 
-      # ✅ Step 2: Debug DNS Resolution
+      # ✅ Step 4: Debug DNS Resolution (to check if domain resolves correctly)
       - name: Debug DNS Resolution
         run: nslookup aapli-dev-api.aapli.app
+        continue-on-error: true
 
-      #
+      # ✅ Step 5: Run Postman Regression Tests
       - name: Run Regression Test Collection with Newman
         uses: gasparhe/newman-action@1.0.0
         with:
-          collection: ${{env.REGRESSION_TEST_COLLECTION_UID }}  # Replace with Regression Test Collection UID
-          environment: ${{ env.REGRESSION_ENVIRONMENT_UID }}  # Postman Environment Name
-          apiKey: ${{ secrets.POSTMANSECRET }}  # Use GitHub Secret
+          collection: ${{ env.REGRESSION_TEST_COLLECTION_UID }}  # Regression Test Collection UID
+          environment: ${{ env.REGRESSION_ENVIRONMENT_UID }}  # Postman Environment UID
+          apiKey: ${{ secrets.POSTMANSECRET }}  # GitHub Secret for Postman API Key
+          reporters: cli, json
+          reporter-json-export: newman-report.json  # Save test report
 
-      # ✅ Step 5: Send Email Notification on Failure
+      # ✅ Step 6: Send Email Notification on Failure
       - name: Send Failure Email Notification
         if: failure()
         uses: dawidd6/action-send-mail@v3
