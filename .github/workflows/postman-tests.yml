@@ -21,18 +21,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      # ✅ Step 3: Check API Accessibility Before Running Tests
-      - name: Check API Accessibility
-        run: |
-          echo "Checking API response..."
-          response_code=$(curl -s -o /dev/null -w "%{http_code}" $DEV_URL/Cards/Add)
-          if [ "$response_code" -ne 200 ]; then
-            echo "API is not responding correctly. Response Code: $response_code"
-            exit 1
-          else
-            echo "API is reachable! Proceeding with tests..."
-          fi
-
       # ✅ Step 4: Debug DNS Resolution (to check if domain resolves correctly)
       - name: Debug DNS Resolution
         run: nslookup aapli-dev-api.aapli.app
